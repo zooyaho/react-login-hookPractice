@@ -31,6 +31,7 @@ function App() {
   };
 
   return (
+    // context의 상태를 변경해줘야함.
     <AuthContext.Provider value={{
       isLoggedIn: isLoggedIn,
     }}>
