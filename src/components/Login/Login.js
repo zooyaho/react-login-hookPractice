@@ -8,21 +8,32 @@ import Button from "../UI/Button/Button";
 const emailReducer = (state, action) => {
   // 최신 state스냅샷, 디스패치된 액션
 
-  if(action.type === "USER_INPUT") {
-    return { value: action.val, isVaild: action.val.includes('@') };
+  if (action.type === "INPUT_EMAIL") {
+    return { value: action.val, isVaild: action.val.includes("@") };
   }
-  if(action.type === "USER_BLUR") {
+  if (action.type === "INPUT_EMAIL_BLUR") {
     // 인풋이 블러되어있으면 state의 값은 최신상태로 반환되어야 함.
-    return { value: state.value, isVaild: state.value.includes('@') };
+    return { value: state.value, isVaild: state.value.includes("@") };
   }
-  return {value:'', isValid:false};
+  return { value: "", isValid: false };
+};
+
+const pswReducer = (state, action) => {
+  // action을 사용하여 로직을 작성함.
+  if (action.type === "INPUT_PSW") {
+    return { value: action.val, isVaild: action.val.trim().length > 5 };
+  }
+  if (action.type === "INPUT_PSW_BLUR") {
+    return { value: state.value, isValid: state.value.trim().length > 5 };
+  }
+  return { value: "", isValid: false };
 };
 
 const Login = (props) => {
   // const [enteredEmail, setEnteredEmail] = useState("");
   // const [emailIsValid, setEmailIsValid] = useState();
-  const [enteredPassword, setEnteredPassword] = useState("");
-  const [passwordIsValid, setPasswordIsValid] = useState();
+  // const [enteredPassword, setEnteredPassword] = useState("");
+  // const [passwordIsValid, setPasswordIsValid] = useState();
   const [formIsValid, setFormIsValid] = useState(false);
 
   const [emailState, dispatchEmail] = useReducer(emailReducer, {
@@ -30,35 +41,40 @@ const Login = (props) => {
     isVaild: null,
   });
 
+  const [pswState, dispatchPsw] = useReducer(pswReducer, {
+    value: "",
+    isValid: null,
+  });
+
   const emailChangeHandler = (event) => {
     // type필드가 있는 이 객체가 '액션'임.
-    dispatchEmail({type: "USER_INPUT", val: event.target.value});
+    dispatchEmail({ type: "INPUT_EMAIL", val: event.target.value });
 
     setFormIsValid(
-      event.target.value.includes("@") && enteredPassword.trim().length > 6
+      event.target.value.includes("@") && pswState.isVaild
     );
   };
 
   const passwordChangeHandler = (event) => {
-    setEnteredPassword(event.target.value);
+    dispatchPsw({ type: "INPUT_PSW", val: event.target.value });
 
     setFormIsValid(
-      emailState.value.includes("@") && enteredPassword.trim().length > 6
+      emailState.isValid && event.target.value.trim().length > 6
     );
   };
 
   const validateEmailHandler = () => {
     // 굳이 값을 설정할 필요 없음.
-    dispatchEmail({type:'USER_BLUR'});
+    dispatchEmail({ type: "INPUT_EMAIL_BLUR" });
   };
 
   const validatePasswordHandler = () => {
-    setPasswordIsValid(enteredPassword.trim().length > 6);
+    dispatchPsw({ type: "INPUT_PSW_BLUR" });
   };
 
   const submitHandler = (event) => {
     event.preventDefault();
-    props.onLogin(emailState.value, enteredPassword);
+    props.onLogin(emailState.value, pswState.value);
   };
 
   return (
@@ -80,14 +96,14 @@ const Login = (props) => {
         </div>
         <div
           className={`${classes.control} ${
-            passwordIsValid === false ? classes.invalid : ""
+            pswState.isVaild === false ? classes.invalid : ""
           }`}
         >
           <label htmlFor="password">Password</label>
           <input
             type="password"
             id="password"
-            value={enteredPassword}
+            value={pswState.value}
             onChange={passwordChangeHandler}
             onBlur={validatePasswordHandler}
           />
