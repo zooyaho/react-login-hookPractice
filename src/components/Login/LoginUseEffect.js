@@ -1,55 +1,48 @@
-import React, { useState, useEffect, useReducer } from "react";
+import React, { useState, useEffect } from "react";
 
 import Card from "../UI/Card/Card";
 import classes from "./Login.module.css";
 import Button from "../UI/Button/Button";
 
-// 함수를 밖으로 뺀 이유: 이 리듀서 함수 내부에서는 컴포넌트 함수 내부에서 만들어진 어떤 데이터도 필요하지 않기 때문!
-const emailReducer = (state, action) => {
-  // 최신 state스냅샷, 디스패치된 액션
-
-  if(action.type === "USER_INPUT") {
-    return { value: action.val, isVaild: action.val.includes('@') };
-  }
-  if(action.type === "USER_BLUR") {
-    // 인풋이 블러되어있으면 state의 값은 최신상태로 반환되어야 함.
-    return { value: state.value, isVaild: state.value.includes('@') };
-  }
-  return {value:'', isValid:false};
-};
-
 const Login = (props) => {
-  // const [enteredEmail, setEnteredEmail] = useState("");
-  // const [emailIsValid, setEmailIsValid] = useState();
+  const [enteredEmail, setEnteredEmail] = useState("");
+  const [emailIsValid, setEmailIsValid] = useState();
   const [enteredPassword, setEnteredPassword] = useState("");
   const [passwordIsValid, setPasswordIsValid] = useState();
   const [formIsValid, setFormIsValid] = useState(false);
 
-  const [emailState, dispatchEmail] = useReducer(emailReducer, {
-    value: "",
-    isVaild: null,
-  });
+  useEffect(() => {
+    // '디바운싱'기술: 사용자 입력을 그룹화하는 것
+    // 일정시간동안 키를 누르지 않으면 그때 유효성검사를 하는게 좋음
+    const identifier = setTimeout(()=>{
+      // 3초동안 입력한 값들의 유효성검사를 하지 않고, 3초 후에 유효성검사를 한번만함.
+      console.log("유효성 검사 시작!");
+      setFormIsValid(
+        enteredEmail.includes("@") && enteredPassword.trim().length > 6
+      );
+    }, 300);
+
+    // return하는 함수를 Cleanup함수라고 함.
+    // 처음 실행 제외하고, 이펙트함수 실행전 클린업함수 실행을 먼저 함.
+    return ()=>{
+      console.log('Clean Up!');
+      // 새로운 타이머를 설정하기 전에 마지막 타이머를 지운것.
+      clearTimeout(identifier);
+    };
+  }, [enteredEmail, enteredPassword]);
+  // 세가지 중(setFormIsValid, enteredEmail, enteredPassword)에 하나라도 변경되면 이펙트함수 실행됨.
+  // state업데이트하는 함수(setFormIsValid)는 보통 생략함, 리액트에 의해 변경되는게 아니기 때문.
 
   const emailChangeHandler = (event) => {
-    // type필드가 있는 이 객체가 '액션'임.
-    dispatchEmail({type: "USER_INPUT", val: event.target.value});
-
-    setFormIsValid(
-      event.target.value.includes("@") && enteredPassword.trim().length > 6
-    );
+    setEnteredEmail(event.target.value);
   };
 
   const passwordChangeHandler = (event) => {
     setEnteredPassword(event.target.value);
-
-    setFormIsValid(
-      emailState.value.includes("@") && enteredPassword.trim().length > 6
-    );
   };
 
   const validateEmailHandler = () => {
-    // 굳이 값을 설정할 필요 없음.
-    dispatchEmail({type:'USER_BLUR'});
+    setEmailIsValid(enteredEmail.includes("@"));
   };
 
   const validatePasswordHandler = () => {
@@ -58,7 +51,7 @@ const Login = (props) => {
 
   const submitHandler = (event) => {
     event.preventDefault();
-    props.onLogin(emailState.value, enteredPassword);
+    props.onLogin(enteredEmail, enteredPassword);
   };
 
   return (
@@ -66,14 +59,14 @@ const Login = (props) => {
       <form onSubmit={submitHandler}>
         <div
           className={`${classes.control} ${
-            emailState.isVaild === false ? classes.invalid : ""
+            emailIsValid === false ? classes.invalid : ""
           }`}
         >
           <label htmlFor="email">E-Mail</label>
           <input
             type="email"
             id="email"
-            value={emailState.value}
+            value={enteredEmail}
             onChange={emailChangeHandler}
             onBlur={validateEmailHandler}
           />
