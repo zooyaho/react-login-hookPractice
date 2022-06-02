@@ -46,17 +46,23 @@ const Login = (props) => {
     isValid: null,
   });
 
+  // 객체의 디스트럭처링을 이용하여 isValid값을 할당함.
+  const {isValid:emailIsValid} = emailState;
+  const {isValid:pswIsValid} = pswState;
+
+  // 값만 변경되고 유효성은 변경되지 않으면 이펙트 함수는 실행되지 않음!
+  // 이펙트가 불필요하게 실행되는 것을 피함.
   useEffect(() => {
     const identifier = setTimeout(() => {
       console.log("유효성 검사 시작!");
-      setFormIsValid(emailState.isValid && pswState.isValid);
+      setFormIsValid(emailIsValid && pswIsValid);
     }, 500);
 
     return () => {
       console.log("Clean Up!");
       clearTimeout(identifier);
     };
-  }, [emailState, pswState]);
+  }, [emailIsValid, pswIsValid]);
 
   const emailChangeHandler = (event) => {
     // type필드가 있는 이 객체가 '액션'임.
