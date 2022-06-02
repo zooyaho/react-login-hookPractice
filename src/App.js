@@ -34,11 +34,12 @@ function App() {
     // context의 상태를 변경해줘야함.
     <AuthContext.Provider value={{
       isLoggedIn: isLoggedIn,
+      onLogout: logoutHandler
     }}>
-      <MainHeader onLogout={logoutHandler} />
+      <MainHeader />
       <main>
         {!isLoggedIn && <Login onLogin={loginHandler} />}
-        {isLoggedIn && <Home onLogout={logoutHandler} />}
+        {isLoggedIn && <Home onLogout={logoutHandler}/>}
       </main>
     </AuthContext.Provider>
   );
