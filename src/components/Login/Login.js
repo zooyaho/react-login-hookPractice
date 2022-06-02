@@ -8,6 +8,8 @@ import Button from "../UI/Button/Button";
 const emailReducer = (state, action) => {
   // 최신 state스냅샷, 디스패치된 액션
 
+  //리액트는 새 액션이 디스패치될 때마다 이 리듀서함수를 호출함, 새로운 업데이트된 state를 반환함.
+
   if (action.type === "INPUT_EMAIL") {
     return { value: action.val, isValid: action.val.includes("@") };
   }
@@ -63,6 +65,7 @@ const Login = (props) => {
       clearTimeout(identifier);
     };
   }, [emailIsValid, pswIsValid]);
+  // emailState.isValid로 작성할 경우, emailState가 변경될 때마다 이펙트함수가 실행될 것이기 때문에 디스트럭쳐링을 사용하여 정의하는 것이 좋음.
 
   const emailChangeHandler = (event) => {
     // type필드가 있는 이 객체가 '액션'임.
