@@ -9,11 +9,11 @@ const emailReducer = (state, action) => {
   // 최신 state스냅샷, 디스패치된 액션
 
   if (action.type === "INPUT_EMAIL") {
-    return { value: action.val, isVaild: action.val.includes("@") };
+    return { value: action.val, isValid: action.val.includes("@") };
   }
   if (action.type === "INPUT_EMAIL_BLUR") {
     // 인풋이 블러되어있으면 state의 값은 최신상태로 반환되어야 함.
-    return { value: state.value, isVaild: state.value.includes("@") };
+    return { value: state.value, isValid: state.value.includes("@") };
   }
   return { value: "", isValid: false };
 };
@@ -21,7 +21,7 @@ const emailReducer = (state, action) => {
 const pswReducer = (state, action) => {
   // action을 사용하여 로직을 작성함.
   if (action.type === "INPUT_PSW") {
-    return { value: action.val, isVaild: action.val.trim().length > 5 };
+    return { value: action.val, isValid: action.val.trim().length > 5 };
   }
   if (action.type === "INPUT_PSW_BLUR") {
     return { value: state.value, isValid: state.value.trim().length > 5 };
@@ -38,7 +38,7 @@ const Login = (props) => {
 
   const [emailState, dispatchEmail] = useReducer(emailReducer, {
     value: "",
-    isVaild: null,
+    isValid: null,
   });
 
   const [pswState, dispatchPsw] = useReducer(pswReducer, {
@@ -51,7 +51,7 @@ const Login = (props) => {
     dispatchEmail({ type: "INPUT_EMAIL", val: event.target.value });
 
     setFormIsValid(
-      event.target.value.includes("@") && pswState.isVaild
+      event.target.value.includes("@") && pswState.isValid
     );
   };
 
@@ -82,7 +82,7 @@ const Login = (props) => {
       <form onSubmit={submitHandler}>
         <div
           className={`${classes.control} ${
-            emailState.isVaild === false ? classes.invalid : ""
+            emailState.isValid === false ? classes.invalid : ""
           }`}
         >
           <label htmlFor="email">E-Mail</label>
@@ -96,7 +96,7 @@ const Login = (props) => {
         </div>
         <div
           className={`${classes.control} ${
-            pswState.isVaild === false ? classes.invalid : ""
+            pswState.isValid === false ? classes.invalid : ""
           }`}
         >
           <label htmlFor="password">Password</label>
