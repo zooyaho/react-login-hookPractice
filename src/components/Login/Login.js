@@ -46,21 +46,25 @@ const Login = (props) => {
     isValid: null,
   });
 
+  useEffect(() => {
+    const identifier = setTimeout(() => {
+      console.log("유효성 검사 시작!");
+      setFormIsValid(emailState.isValid && pswState.isValid);
+    }, 500);
+
+    return () => {
+      console.log("Clean Up!");
+      clearTimeout(identifier);
+    };
+  }, [emailState, pswState]);
+
   const emailChangeHandler = (event) => {
     // type필드가 있는 이 객체가 '액션'임.
     dispatchEmail({ type: "INPUT_EMAIL", val: event.target.value });
-
-    setFormIsValid(
-      event.target.value.includes("@") && pswState.isValid
-    );
   };
 
   const passwordChangeHandler = (event) => {
     dispatchPsw({ type: "INPUT_PSW", val: event.target.value });
-
-    setFormIsValid(
-      emailState.isValid && event.target.value.trim().length > 6
-    );
   };
 
   const validateEmailHandler = () => {
