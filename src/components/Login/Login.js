@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useReducer, useContext } from "react";
+import React, {
+  useState,
+  useEffect,
+  useReducer,
+  useContext,
+  useRef,
+} from "react";
 
 import Card from "../UI/Card/Card";
 import classes from "./Login.module.css";
@@ -55,6 +61,9 @@ const Login = (props) => {
   const { isValid: emailIsValid } = emailState;
   const { isValid: pswIsValid } = pswState;
 
+  const emailInputRef = useRef();
+  const passwordInputRef = useRef();
+
   // 값만 변경되고 유효성은 변경되지 않으면 이펙트 함수는 실행되지 않음!
   // 이펙트가 불필요하게 실행되는 것을 피함.
   useEffect(() => {
@@ -90,13 +99,21 @@ const Login = (props) => {
 
   const submitHandler = (event) => {
     event.preventDefault();
-    authCtx.onLogin(emailState.value, pswState.value);
+    if (formIsValid) {
+      authCtx.onLogin(emailState.value, pswState.value);
+    } else if (!emailIsValid) {
+      // 유효하지 않는 첫번째 input에 포커스 설정
+      emailInputRef.current.focus();
+    } else {
+      passwordInputRef.current.focus();
+    }
   };
 
   return (
     <Card className={classes.login}>
       <form onSubmit={submitHandler}>
         <Input
+          ref={emailInputRef}
           label={"E-Mail"}
           id={"email"}
           type={"email"}
@@ -106,6 +123,7 @@ const Login = (props) => {
           onBlur={validateEmailHandler}
         />
         <Input
+          ref={passwordInputRef}
           label={"Password"}
           id={"password"}
           type={"password"}
@@ -115,7 +133,7 @@ const Login = (props) => {
           onBlur={validatePasswordHandler}
         />
         <div className={classes.actions}>
-          <Button type="submit" className={classes.btn} disabled={!formIsValid}>
+          <Button type="submit" className={classes.btn}>
             Login
           </Button>
         </div>
