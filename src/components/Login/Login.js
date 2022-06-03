@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useReducer,useContext } from "react";
+import React, { useState, useEffect, useReducer, useContext } from "react";
 
 import Card from "../UI/Card/Card";
 import classes from "./Login.module.css";
-import Button from "../UI/Button/Button";
 import AuthContext from "../../store/auth-context";
+import Input from "../UI/Input/Input";
+import Button from "../UI/Button/Button";
 
 // 함수를 밖으로 뺀 이유: 이 리듀서 함수 내부에서는 컴포넌트 함수 내부에서 만들어진 어떤 데이터도 필요하지 않기 때문!
 const emailReducer = (state, action) => {
@@ -51,8 +52,8 @@ const Login = (props) => {
   });
 
   // 객체의 디스트럭처링을 이용하여 isValid값을 할당함.
-  const {isValid:emailIsValid} = emailState;
-  const {isValid:pswIsValid} = pswState;
+  const { isValid: emailIsValid } = emailState;
+  const { isValid: pswIsValid } = pswState;
 
   // 값만 변경되고 유효성은 변경되지 않으면 이펙트 함수는 실행되지 않음!
   // 이펙트가 불필요하게 실행되는 것을 피함.
@@ -95,34 +96,24 @@ const Login = (props) => {
   return (
     <Card className={classes.login}>
       <form onSubmit={submitHandler}>
-        <div
-          className={`${classes.control} ${
-            emailState.isValid === false ? classes.invalid : ""
-          }`}
-        >
-          <label htmlFor="email">E-Mail</label>
-          <input
-            type="email"
-            id="email"
-            value={emailState.value}
-            onChange={emailChangeHandler}
-            onBlur={validateEmailHandler}
-          />
-        </div>
-        <div
-          className={`${classes.control} ${
-            pswState.isValid === false ? classes.invalid : ""
-          }`}
-        >
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            value={pswState.value}
-            onChange={passwordChangeHandler}
-            onBlur={validatePasswordHandler}
-          />
-        </div>
+        <Input
+          label={"E-Mail"}
+          id={"email"}
+          type={"email"}
+          isValid={emailState.isValid}
+          value={emailState.value}
+          onChange={emailChangeHandler}
+          onBlur={validateEmailHandler}
+        />
+        <Input
+          label={"Password"}
+          id={"password"}
+          type={"password"}
+          isValid={pswState.isValid}
+          value={pswState.value}
+          onChange={passwordChangeHandler}
+          onBlur={validatePasswordHandler}
+        />
         <div className={classes.actions}>
           <Button type="submit" className={classes.btn} disabled={!formIsValid}>
             Login
